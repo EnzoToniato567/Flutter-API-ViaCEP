@@ -78,6 +78,22 @@ class _HomePageState extends State<HomePage> {
     _mostrarMensagem('Cadastro excluído.');
   }
 
+  Future<void> _editarCadastro(Cadastro pessoa) async {
+    final cadastroAtualizado = await Navigator.push<Cadastro>(
+      context,
+      MaterialPageRoute(builder: (_) => CadastroPage(cadastro: pessoa)),
+    );
+
+    if (cadastroAtualizado == null || !mounted) return;
+
+    final index = _cadastros.indexOf(pessoa);
+    if (index == -1) return;
+
+    setState(() => _cadastros[index] = cadastroAtualizado);
+    await CadastroFile.salvar(_cadastros);
+    _mostrarMensagem('Cadastro atualizado.');
+  }
+
   void _mostrarMensagem(String texto) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(texto)));
@@ -85,6 +101,41 @@ class _HomePageState extends State<HomePage> {
 
   void _voltarParaSplash() {
     Navigator.pushReplacementNamed(context, '/');
+  }
+
+  void _mostrarDetalhes(Cadastro pessoa) {
+    final complemento = pessoa.complemento.trim().isEmpty
+        ? 'Não informado'
+        : pessoa.complemento;
+
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(pessoa.nome),
+        content: Text(
+          'CEP: ${pessoa.cep}\n'
+          'Rua: ${pessoa.logradouro}\n'
+          'Número: ${pessoa.numero}\n'
+          'Complemento: $complemento\n'
+          'Bairro: ${pessoa.bairro}\n'
+          'Cidade: ${pessoa.cidade}\n'
+          'Estado: ${pessoa.estado}',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _editarCadastro(pessoa);
+            },
+            child: const Text('EDITAR'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('FECHAR'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -139,6 +190,7 @@ class _HomePageState extends State<HomePage> {
                 final pessoa = _cadastros[index];
                 return Card(
                   child: ListTile(
+                    onTap: () => _mostrarDetalhes(pessoa),
                     title: Text(pessoa.nome),
                     subtitle: Text(
                       '${pessoa.logradouro}, ${pessoa.numero}\n'

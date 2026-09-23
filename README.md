@@ -9,36 +9,47 @@ formulário de cadastro integrado à API gratuita do ViaCEP.
 ## Baixar o aplicativo
 
 ### [Baixar o APK do Verde CEP para Android](./assets/verde_cep.apk)
+- Para gerar o APK localmente, rode 
+``` bash
+flutter build apk --release
+```
 
 ## Screenshots
 
 <table>
-  <thead>
-    <tr>
-      <th width="33%" align="center">Splash</th>
-      <th width="33%" align="center">Home</th>
-      <th width="33%" align="center">Cadastro</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td align="center" valign="top">
-        <img src="./assets/docs/screenshot1.png" alt="Tela Splash" width="100%">
-      </td>
-      <td align="center" valign="top">
-        <img src="./assets/docs/screenshot2.png" alt="Tela Home" width="100%">
-      </td>
-      <td align="center" valign="top">
-        <img src="./assets/docs/screenshot3.png" alt="Tela de cadastro" width="100%">
-      </td>
-    </tr>
-  </tbody>
+  <tr>
+    <th width="50%" align="center">Splash</th>
+    <th width="50%" align="center">Home</th>
+  </tr>
+  <tr>
+    <td align="center" valign="top">
+      <img src="./assets/docs/screenshot1.png" alt="Tela Splash" width="360">
+    </td>
+    <td align="center" valign="top">
+      <img src="./assets/docs/screenshot2.png" alt="Tela Home" width="360">
+    </td>
+  </tr>
+  <tr>
+    <th width="50%" align="center">Cadastro</th>
+    <th width="50%" align="center">Pessoas cadastradas</th>
+  </tr>
+  <tr>
+    <td align="center" valign="top">
+      <img src="./assets/docs/screenshot3.png" alt="Tela de cadastro" width="360">
+    </td>
+    <td align="center" valign="top">
+      <img src="./assets/docs/screenshot4.png" alt="Pessoas cadastradas" width="360">
+    </td>
+  </tr>
 </table>
 
 ## Funcionalidades
 
 - Tela Splash com ícone e botão para entrar no aplicativo.
 - Tela Home com menu lateral e lista de pessoas cadastradas.
+- Modal com todos os dados da pessoa ao tocar em um cadastro.
+- Exibição do complemento da residência no modal de detalhes.
+- Edição e atualização de cadastros pelo botão `Editar` do modal.
 - Botão para voltar da Home para a Splash.
 - Cadastro de nome, CEP, número e complemento.
 - Consulta automática de rua, bairro, cidade e estado.
@@ -170,12 +181,34 @@ await prefs.setString(chave, jsonEncode(dados));
 Assim, os cadastros continuam disponíveis depois que o aplicativo é fechado e
 aberto novamente.
 
+## Detalhes da pessoa
+
+Na Home, basta tocar em uma pessoa cadastrada para abrir um modal com nome,
+CEP, rua, número, complemento, bairro, cidade e estado. Quando nenhum
+complemento foi cadastrado, o aplicativo mostra `Não informado`.
+
+Para atualizar os dados, pressione **Editar** no modal. O mesmo formulário de
+cadastro será aberto já preenchido; faça as alterações necessárias e pressione
+**Atualizar**. O registro anterior será substituído e salvo novamente no
+dispositivo.
+
+O modal é aberto em [home.dart](lib/ui/home.dart):
+
+```dart
+ListTile(
+  onTap: () => _mostrarDetalhes(pessoa),
+  title: Text(pessoa.nome),
+)
+```
+
 ## Fluxo do aplicativo
 
 ```text
 Splash
   └── Entrar
        └── Home
+            ├── Tocar na pessoa para visualizar os detalhes
+            │    └── Editar e atualizar o cadastro
             ├── Adicionar pessoa
             │    └── Consultar CEP
             │         └── Salvar cadastro

@@ -5,7 +5,9 @@ import '../models/cadastro.dart';
 import '../services/viacep.dart';
 
 class CadastroPage extends StatefulWidget {
-  const CadastroPage({super.key});
+  const CadastroPage({super.key, this.cadastro});
+
+  final Cadastro? cadastro;
 
   @override
   State<CadastroPage> createState() => _CadastroPageState();
@@ -25,6 +27,24 @@ class _CadastroPageState extends State<CadastroPage> {
   bool _buscandoCep = false;
   bool _cepEncontrado = false;
   String? _erroCep;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final cadastro = widget.cadastro;
+    if (cadastro == null) return;
+
+    _nome.text = cadastro.nome;
+    _cep.text = cadastro.cep.replaceAll(RegExp(r'\D'), '');
+    _rua.text = cadastro.logradouro;
+    _bairro.text = cadastro.bairro;
+    _cidade.text = cadastro.cidade;
+    _estado.text = cadastro.estado;
+    _numero.text = cadastro.numero;
+    _complemento.text = cadastro.complemento;
+    _cepEncontrado = true;
+  }
 
   @override
   void dispose() {
@@ -113,8 +133,12 @@ class _CadastroPageState extends State<CadastroPage> {
 
   @override
   Widget build(BuildContext context) {
+    final editando = widget.cadastro != null;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Novo cadastro')),
+      appBar: AppBar(
+        title: Text(editando ? 'Editar cadastro' : 'Novo cadastro'),
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -155,7 +179,7 @@ class _CadastroPageState extends State<CadastroPage> {
             const SizedBox(height: 8),
             ElevatedButton(
               onPressed: _buscandoCep ? null : _salvar,
-              child: const Text('SALVAR'),
+              child: Text(editando ? 'ATUALIZAR' : 'SALVAR'),
             ),
           ],
         ),
